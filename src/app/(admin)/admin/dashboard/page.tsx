@@ -128,13 +128,14 @@ export default function AdminDashboard() {
 
     const { data: publicUrlData } = supabase.storage
       .from('resume')
-      .getPublicUrl(filePath);
+      .getPublicUrl('resume.pdf');
 
     if (!publicUrlData || !publicUrlData.publicUrl) {
       throw new Error('Gagal mendapatkan tautan publik resume.');
     }
 
-    return publicUrlData.publicUrl;
+    // Paksa browser mendapatkan versi terbaru dengan timestamp
+    return `${publicUrlData.publicUrl}?v=${Date.now()}`;
   };
 
   const loadCurrentResumeUrl = async () => {
@@ -145,9 +146,10 @@ export default function AdminDashboard() {
         .getPublicUrl('resume.pdf');
 
       if (publicUrlData?.publicUrl) {
+        // Cek apakah file ada, jika ya tampilkan dengan cache-buster
         const response = await fetch(publicUrlData.publicUrl, { method: 'HEAD' });
         if (response.ok) {
-          setCurrentResumeUrl(publicUrlData.publicUrl);
+          setCurrentResumeUrl(`${publicUrlData.publicUrl}?v=${Date.now()}`);
         }
       }
     } catch {
