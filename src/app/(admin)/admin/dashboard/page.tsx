@@ -418,27 +418,15 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center gap-3">
               {currentResumeUrl ? (
-                <button
-                  onClick={async () => {
-                    const supabase = createClient();
-                    const { data, error } = await supabase.storage.from('resume').download('resume.pdf');
-                    if (error) {
-                      alert('Gagal mendownload: ' + error.message);
-                      return;
-                    }
-                    const url = window.URL.createObjectURL(data);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.setAttribute('download', 'resume-noval.pdf');
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
-                  }}
+                <a
+                  href={currentResumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition-colors text-sm font-semibold"
                 >
                   <ExternalLinkIcon className="w-4 h-4" />
-                  Unduh / Lihat Resume
-                </button>
+                  Buka Preview Resume
+                </a>
               ) : (
                 <span className="px-4 py-2 bg-zinc-800 text-zinc-400 rounded-lg text-sm">Resume belum tersedia</span>
               )}
