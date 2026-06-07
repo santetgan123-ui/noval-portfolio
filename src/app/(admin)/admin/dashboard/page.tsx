@@ -114,6 +114,7 @@ export default function AdminDashboard() {
     const supabase = createClient();
     const filePath = 'resume.pdf';
 
+    // Proses Unggah dengan paksa metadata inline (untuk preview, bukan download)
     const { error: uploadError } = await supabase.storage
       .from('resume')
       .upload(filePath, file, {
