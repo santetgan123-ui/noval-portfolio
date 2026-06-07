@@ -117,13 +117,20 @@ export default function AdminDashboard() {
     const { error: uploadError } = await supabase.storage
       .from('resume')
       .upload(filePath, file, {
-        cacheControl: '3600',
+        cacheControl: '0',
         upsert: true,
         contentType: 'application/pdf',
       });
 
     if (uploadError) {
       throw new Error(`Gagal mengunggah resume: ${uploadError.message}`);
+    }
+
+    // Verifikasi fisik: pastikan file ada di list storage
+    const { data: files } = await supabase.storage.from('resume').list();
+    const exists = files?.some(f => f.name === 'resume.pdf');
+    if (!exists) {
+      throw new Error('Upload berhasil tapi file tidak terdeteksi di server. Cek RLS Policy Supabase Anda.');
     }
 
     const { data: publicUrlData } = supabase.storage
@@ -134,8 +141,7 @@ export default function AdminDashboard() {
       throw new Error('Gagal mendapatkan tautan publik resume.');
     }
 
-    // Paksa browser mendapatkan versi terbaru dengan timestamp
-    return `${publicUrlData.publicUrl}?v=${Date.now()}`;
+    return `${publicUrlData.publicUrl}?t=${Date.now()}`;
   };
 
   const loadCurrentResumeUrl = async () => {
