@@ -12,6 +12,8 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     const blob = await put(`resume/${filename}`, request.body, {
       access: 'public',
+      contentType: 'application/pdf',
+      addRandomSuffix: true,
     });
 
     return NextResponse.json(blob);
