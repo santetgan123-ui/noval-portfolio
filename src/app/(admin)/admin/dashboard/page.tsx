@@ -418,15 +418,28 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center gap-3">
               {currentResumeUrl ? (
-                <a
-                  href={currentResumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition-colors text-sm font-semibold"
-                >
-                  <ExternalLinkIcon className="w-4 h-4" />
-                  Buka Preview Resume
-                </a>
+                <div className="flex gap-2">
+                  <a
+                    href={currentResumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition-colors text-sm font-semibold"
+                  >
+                    <ExternalLinkIcon className="w-4 h-4" />
+                    Buka Preview
+                  </a>
+                  <button
+                    onClick={() => {
+                      // Hapus query string (?t=...) agar link bersih
+                      const cleanUrl = currentResumeUrl.split('?')[0];
+                      navigator.clipboard.writeText(cleanUrl);
+                      alert('Link PDF berhasil disalin!');
+                    }}
+                    className="px-4 py-2 bg-zinc-800 text-zinc-300 rounded-lg hover:bg-zinc-700 text-sm"
+                  >
+                    Salin Link
+                  </button>
+                </div>
               ) : (
                 <span className="px-4 py-2 bg-zinc-800 text-zinc-400 rounded-lg text-sm">Resume belum tersedia</span>
               )}
