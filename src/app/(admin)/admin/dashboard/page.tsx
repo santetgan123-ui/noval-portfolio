@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Project } from '@/types';
-import { put } from '@vercel/blob';
 import {
   UploadIcon,
   TrashIcon,
@@ -108,53 +107,13 @@ export default function AdminDashboard() {
   };
 
   const handleResumeUpload = async (file: File): Promise<string> => {
-    if (file.type !== 'application/pdf') {
-      throw new Error('Format berkas harus PDF.');
-    }
-
-    try {
-      const response = await fetch(
-        `/api/resume/upload?filename=${encodeURIComponent(file.name)}`,
-        {
-          method: 'POST',
-          body: file,
-        },
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Gagal mengunggah file.');
-      }
-
-      const blob = await response.json();
-      const finalUrl = blob.url;
-
-      const supabase = createClient();
-      await supabase.from('site_settings').upsert({ key: 'resume_url', value: finalUrl });
-
-      return finalUrl;
-    } catch (error) {
-      throw new Error('Gagal upload ke Vercel Blob: ' + (error as Error).message);
-    }
+    // Fitur ini dinonaktifkan sementara. Gunakan penggantian file manual di folder public/resume/
+    throw new Error('Fitur upload dinonaktifkan. Silakan ganti file secara manual di folder public/resume/ dan push ke GitHub.');
   };
 
   const loadCurrentResumeUrl = async () => {
-    try {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from('site_settings')
-        .select('value')
-        .eq('key', 'resume_url')
-        .single();
-
-      if (data?.value) {
-        setCurrentResumeUrl(data.value);
-      } else {
-        setCurrentResumeUrl('/resume/noval-abdillah.pdf');
-      }
-    } catch {
-      setCurrentResumeUrl('/resume/noval-abdillah.pdf');
-    }
+    // Selalu gunakan file lokal statis
+    setCurrentResumeUrl('/resume/CV_Frontend_Backend (1).pdf');
   };
   const triggerRevalidation = async () => {
     try {
