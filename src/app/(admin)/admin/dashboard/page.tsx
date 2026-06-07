@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Project } from '@/types';
+import { put } from '@vercel/blob';
 import {
   UploadIcon,
   TrashIcon,
@@ -111,32 +112,23 @@ export default function AdminDashboard() {
       throw new Error('Format berkas harus PDF.');
     }
 
-    const supabase = createClient();
-    // Gunakan nama asli file sesuai permintaan Anda
-    const filePath = file.name.replace(/\s+/g, '_');
-
-    const { error: uploadError } = await supabase.storage
-      .from('resume')
-      .upload(filePath, file, {
-        cacheControl: '0',
-        upsert: true,
-        contentType: 'application/pdf'
+    // UPLOAD KE VERCEL BLOB (Pasti Publik & Stabil)
+    try {
+      const blob = await put(`resume/${Date.now()}-${file.name}`, file, {
+        access: 'public',
+        addRandomSuffix: true,
       });
 
-    if (uploadError) {
-      throw new Error(`Gagal mengunggah resume: ${uploadError.message}`);
+      const finalUrl = blob.url;
+
+      // Tetap catat di database agar Home Page selalu terupdate linknya
+      const supabase = createClient();
+      await supabase.from('site_settings').upsert({ key: 'resume_url', value: finalUrl });
+
+      return finalUrl;
+    } catch (error) {
+      throw new Error('Gagal upload ke Vercel Blob: ' + (error as Error).message);
     }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('resume')
-      .getPublicUrl(filePath);
-
-    const finalUrl = publicUrlData.publicUrl;
-
-    // Simpan URL terbaru ke database agar halaman Home tahu file mana yang dibuka
-    await supabase.from('site_settings').upsert({ key: 'resume_url', value: finalUrl });
-
-    return finalUrl;
   };
 
   const loadCurrentResumeUrl = async () => {
