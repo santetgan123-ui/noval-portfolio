@@ -177,7 +177,7 @@ export default function Hero() {
             {/* PDF Viewer Frame */}
             <div className="flex-1 bg-zinc-800">
               <iframe 
-                src={`${resumeUrl}#toolbar=0`} 
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(resumeUrl)}&embedded=true`} 
                 className="w-full h-full border-none"
                 title="Resume Preview"
               />
