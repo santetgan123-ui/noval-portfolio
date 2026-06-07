@@ -1,0 +1,116 @@
+export type Language = 'en' | 'id';
+
+export const translations = {
+  en: {
+    nav: {
+      home: 'Home',
+      about: 'About',
+      projects: 'Projects',
+      contact: 'Contact',
+    },
+    hero: {
+      role: 'FRONTEND & BACKEND DEVELOPER',
+      subtitle: 'Specializing in AI-Assisted Development, crafting production-grade web applications rapidly with Next.js, LLMs, and modern UI engineering.',
+      viewProjects: 'View Projects',
+      downloadResume: 'Download Resume',
+    },
+    about: {
+      title: 'About Me',
+      role: 'Frontend & Backend Developer',
+      p1: 'I am a Frontend and Backend Developer who leverages AI as a collaborative programming partner. Because I have a strong foundation in software engineering fundamentals, I can effectively direct AI tools and prevent them from hallucinating or losing architectural direction.',
+      p2: 'My core stack includes Next.js, Node.js, and PostgreSQL. I combine modern development frameworks with AI-assisted coding to rapidly build robust, scalable, and production-ready applications without compromising code quality.',
+      p3: 'Currently at CiptaInterior / CKS Group, I am building a CMS platform and admin dashboard with JWT/RBAC authentication.',
+      techStack: 'Technical Stack',
+      certifications: 'Certifications',
+      aiAssisted: 'AI-Assisted Development',
+      problemSolving: 'Problem Solving Intermediate',
+      profileBadge: 'Frontend & Backend Dev',
+      officeTools: 'Office Tools Proficiency',
+      previewCert: 'Preview',
+    },
+    projects: {
+      title: 'Featured Projects',
+      subtitle: 'A selection of my recent work in full-stack development, AI integration, and modern web applications.',
+      viewCode: 'Source Code',
+      viewLive: 'Live Demo',
+    },
+    contact: {
+      title: 'Get In Touch',
+      subtitle: 'Have a project in mind or want to collaborate? Feel free to reach out. I am currently available for new opportunities.',
+      nameLabel: 'Name',
+      namePlaceholder: 'John Doe',
+      emailLabel: 'Email',
+      emailPlaceholder: 'john@example.com',
+      messageLabel: 'Message',
+      messagePlaceholder: 'Tell me about your project...',
+      sendMessage: 'Send Message',
+      sending: 'Sending...',
+      successTitle: 'Message Sent!',
+      successDesc: 'Thank you for reaching out. I will get back to you soon.',
+      errorTitle: 'Error!',
+      errorDesc: 'Something went wrong. Please try again later.',
+    },
+    footer: {
+      description: 'Full Stack Developer focused on building high-quality, production-grade applications with modern technologies.',
+      quickLinks: 'Quick Links',
+      connect: 'Connect',
+      rights: 'All rights reserved.',
+    }
+  },
+  id: {
+    nav: {
+      home: 'Beranda',
+      about: 'Tentang',
+      projects: 'Proyek',
+      contact: 'Kontak',
+    },
+    hero: {
+      role: 'FRONTEND & BACKEND DEVELOPER', // Usually kept in English for professional titles
+      subtitle: 'Spesialis dalam Pengembangan dengan Bantuan AI, merancang aplikasi web kelas produksi secara cepat dengan Next.js, LLM, dan rekayasa UI modern.',
+      viewProjects: 'Lihat Proyek',
+      downloadResume: 'Unduh Resume',
+    },
+    about: {
+      title: 'Tentang Saya',
+      role: 'Frontend & Backend Developer',
+      p1: 'Saya adalah seorang Frontend dan Backend Developer yang terbiasa menggunakan AI sebagai rekan kolaborasi dalam pemrograman. Dengan pemahaman fundamental rekayasa perangkat lunak yang kuat, saya dapat mengarahkan AI secara efektif tanpa membuatnya kehilangan arah atau merusak arsitektur.',
+      p2: 'Keahlian utama saya mencakup Next.js, Node.js, dan PostgreSQL. Saya memadukan framework modern dengan koding berbantuan AI untuk membangun aplikasi yang kokoh, terukur, dan siap produksi dengan sangat cepat tanpa mengorbankan kualitas kode.',
+      p3: 'Saat ini bekerja di CiptaInterior / CKS Group, membangun platform CMS dan dashboard admin dengan autentikasi JWT/RBAC.',
+      techStack: 'Tumpukan Teknologi',
+      certifications: 'Sertifikasi',
+      aiAssisted: 'Pengembangan dengan Bantuan AI',
+      problemSolving: 'Pemecahan Masalah Menengah',
+      profileBadge: 'Frontend & Backend Dev',
+      officeTools: 'Penguasaan Microsoft Office',
+      previewCert: 'Pratinjau',
+    },
+    projects: {
+      title: 'Proyek Unggulan',
+      subtitle: 'Beberapa hasil karya terbaru saya dalam pengembangan full-stack, integrasi AI, dan aplikasi web modern.',
+      viewCode: 'Kode Sumber',
+      viewLive: 'Demo Langsung',
+    },
+    contact: {
+      title: 'Hubungi Saya',
+      subtitle: 'Punya ide proyek atau ingin berkolaborasi? Jangan ragu untuk menghubungi. Saat ini saya terbuka untuk peluang baru.',
+      nameLabel: 'Nama',
+      namePlaceholder: 'Budi Santoso',
+      emailLabel: 'Email',
+      emailPlaceholder: 'budi@contoh.com',
+      messageLabel: 'Pesan',
+      messagePlaceholder: 'Ceritakan tentang proyek Anda...',
+      sendMessage: 'Kirim Pesan',
+      sending: 'Mengirim...',
+      successTitle: 'Pesan Terkirim!',
+      successDesc: 'Terima kasih telah menghubungi. Saya akan segera membalas pesan Anda.',
+      errorTitle: 'Terjadi Kesalahan!',
+      errorDesc: 'Ada yang salah. Silakan coba lagi nanti.',
+    },
+    footer: {
+      description: 'Full Stack Developer yang fokus membangun aplikasi berkualitas tinggi dan berstandar produksi dengan teknologi modern.',
+      quickLinks: 'Tautan Cepat',
+      connect: 'Terhubung',
+      rights: 'Hak cipta dilindungi.',
+    }
+  }
+};

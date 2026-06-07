@@ -1,0 +1,109 @@
+﻿Resume Upload Section */}
+        <div id="resume-section" className="bg-zinc-900/90 p-8 rounded-2xl border border-zinc-800 mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-white">Kelola Resume</h2>
+              <p className="text-sm text-zinc-400 mt-1">
+                Unggah file PDF baru untuk resume. File lama akan otomatis tergantikan.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              {currentResumeUrl ? (
+                <a
+                  href={currentResumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-200 rounded-lg hover:bg-zinc-700 transition-colors text-sm"
+                >
+                  <ExternalLinkIcon className="w-4 h-4" />
+                  Unduh Resume Saat Ini
+                </a>
+              ) : (
+                <span className="px-4 py-2 bg-zinc-800 text-zinc-400 rounded-lg text-sm">Resume belum tersedia</span>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+            <div className="space-y-4">
+              {resumeError && (
+                <div className="p-4 bg-red-950/40 border border-red-800/60 rounded-lg flex items-start gap-3 text-red-400">
+                  <WarningIcon className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-red-200 text-sm">Kesalahan Upload</h4>
+                    <p className="text-xs text-red-400/90 mt-1">{resumeError}</p>
+                  </div>
+                </div>
+              )}
+
+              {resumeSuccess && (
+                <div className="p-4 bg-green-950/40 border border-green-800/60 rounded-lg flex items-start gap-3 text-green-400">
+                  <CheckIcon className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-green-200 text-sm">Resume Terunggah</h4>
+                    <p className="text-xs text-green-400/90 mt-1">{resumeSuccess}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-lg">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">Pilih PDF Resume</label>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+                  className="block w-full text-xs text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-500 transition-colors"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!resumeFile) {
+                      setResumeError('Pilih file PDF resume terlebih dahulu.');
+                      return;
+                    }
+                    setResumeError(null);
+                    setResumeSuccess(null);
+                    setResumeUploading(true);
+                    try {
+                      const publicUrl = await handleResumeUpload(resumeFile);
+                      setResumeSuccess('Resume berhasil diunggah dan sekarang tersedia untuk diunduh.');
+                      setCurrentResumeUrl(publicUrl);
+                      setResumeFile(null);
+                      await triggerRevalidation();
+                    } catch (err) {
+                      setResumeError(err instanceof Error ? err.message : 'Gagal mengunggah resume.');
+                    } finally {
+                      setResumeUploading(false);
+                    }
+                  }}
+                  disabled={resumeUploading}
+                  className="px-6 py-3 bg-green-600 hover:bg-green-500 disabled:bg-green-600/40 text-white font-semibold rounded-lg transition-colors text-sm"
+                >
+                  {resumeUploading ? 'Mengunggah...' : 'Unggah Resume PDF'}
+                </button>
+                <p className="text-xs text-zinc-500">File akan diunggah ke bucket Supabase <strong>resume</strong> dengan nama <code>resume.pdf</code>.</p>
+              </div>
+            </div>
+
+            <div className="p-6 bg-zinc-950 border border-zinc-800 rounded-3xl">
+              <h3 className="text-base font-semibold text-white mb-3">Status Resume Saat Ini</h3>
+              <p className="text-sm text-zinc-400 mb-4">
+                Di sini Anda bisa melihat apakah resume sudah tersedia dan langsung mengunduhnya.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between rounded-lg bg-zinc-900/70 p-4">
+                  <span className="text-sm text-zinc-300">Status</span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${currentResumeUrl ? 'bg-emerald-600/15 text-emerald-300' : 'bg-red-600/10 text-red-300'}`}>
+                    {currentResumeUrl ? 'Aktif' : 'Tidak tersedia'}
+                  </span>
+                </div>
+                <div className="rounded-lg bg-zinc-900/70 p-4 text-sm text-zinc-400">
+                  <p className="font-medium text-white mb-2">Link Unduhan:</p>
+                  <p className="truncate">{currentResumeUrl ?? 'Belum ada resume terunggah.'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
