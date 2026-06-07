@@ -40,7 +40,6 @@ export default function Hero() {
   const ctaRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
   const [resumeUrl, setResumeUrl] = useState('/resume/noval-abdillah.pdf');
-  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -128,6 +127,8 @@ export default function Hero() {
             <DownloadIcon className="w-5 h-5" />
             {t.hero.downloadResume}
           </a>
+        </div>
+      </div>
 
       {/* Scroll indicator */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 animate-bounce">
