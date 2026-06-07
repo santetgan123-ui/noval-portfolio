@@ -31,6 +31,12 @@ export default function AdminDashboard() {
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [dashboardSuccess, setDashboardSuccess] = useState<string | null>(null);
 
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const [resumeSuccess, setResumeSuccess] = useState<string | null>(null);
+  const [resumeError, setResumeError] = useState<string | null>(null);
+  const [currentResumeUrl, setCurrentResumeUrl] = useState<string | null>(null);
+
   const router = useRouter();
 
   // Form input state
@@ -45,6 +51,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchProjects();
+    loadCurrentResumeUrl();
   }, []);
 
   const fetchProjects = async () => {
@@ -98,6 +105,54 @@ export default function AdminDashboard() {
     return publicUrlData.publicUrl;
   };
 
+  const handleResumeUpload = async (file: File): Promise<string> => {
+    if (file.type !== 'application/pdf') {
+      throw new Error('Format berkas harus PDF.');
+    }
+
+    const supabase = createClient();
+    const filePath = 'resume.pdf';
+
+    const { error: uploadError } = await supabase.storage
+      .from('resume')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: 'application/pdf',
+      });
+
+    if (uploadError) {
+      throw new Error(`Gagal mengunggah resume: ${uploadError.message}`);
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('resume')
+      .getPublicUrl(filePath);
+
+    if (!publicUrlData || !publicUrlData.publicUrl) {
+      throw new Error('Gagal mendapatkan tautan publik resume.');
+    }
+
+    return publicUrlData.publicUrl;
+  };
+
+  const loadCurrentResumeUrl = async () => {
+    try {
+      const supabase = createClient();
+      const { data: publicUrlData } = supabase.storage
+        .from('resume')
+        .getPublicUrl('resume.pdf');
+
+      if (publicUrlData?.publicUrl) {
+        const response = await fetch(publicUrlData.publicUrl, { method: 'HEAD' });
+        if (response.ok) {
+          setCurrentResumeUrl(publicUrlData.publicUrl);
+        }
+      }
+    } catch {
+      // Jika tidak tersedia, tetap gunakan status awal tanpa menampilkan URL.
+    }
+  };
   const triggerRevalidation = async () => {
     try {
       const res = await fetch('/api/revalidate', {
@@ -296,6 +351,91 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* Resume Upload Section */}
+        <div className="bg-zinc-900/90 p-8 rounded-2xl border border-zinc-800 mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-white">Kelola Resume</h2>
+              <p className="text-sm text-zinc-400 mt-1">
+                Unggah file PDF baru untuk resume. File lama akan otomatis tergantikan.
+              </p>
+            </div>
+            {currentResumeUrl && (
+              <a
+                href={currentResumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-200 rounded-lg hover:bg-zinc-700 transition-colors text-sm"
+              >
+                <ExternalLinkIcon className="w-4 h-4" />
+                Lihat Resume Saat Ini
+              </a>
+            )}
+          </div>
+
+          {resumeError && (
+            <div className="mb-6 p-4 bg-red-950/40 border border-red-800/60 rounded-lg flex items-start gap-3 text-red-400">
+              <WarningIcon className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-red-200 text-sm">Kesalahan Upload</h4>
+                <p className="text-xs text-red-400/90 mt-1">{resumeError}</p>
+              </div>
+            </div>
+          )}
+
+          {resumeSuccess && (
+            <div className="mb-6 p-4 bg-green-950/40 border border-green-800/60 rounded-lg flex items-start gap-3 text-green-400">
+              <CheckIcon className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-green-200 text-sm">Resume Terunggah</h4>
+                <p className="text-xs text-green-400/90 mt-1">{resumeSuccess}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 p-4 bg-zinc-950 border border-zinc-800 rounded-lg">
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+                className="block w-full text-xs text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-500 transition-colors"
+              />
+              {resumeUploading && <SVGSpinner size={24} />}
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!resumeFile) {
+                    setResumeError('Pilih file PDF resume terlebih dahulu.');
+                    return;
+                  }
+                  setResumeError(null);
+                  setResumeSuccess(null);
+                  setResumeUploading(true);
+                  try {
+                    const publicUrl = await handleResumeUpload(resumeFile);
+                    setResumeSuccess('Resume berhasil diunggah dan sekarang tersedia untuk diunduh.');
+                    setCurrentResumeUrl(publicUrl);
+                    setResumeFile(null);
+                    await triggerRevalidation();
+                  } catch (err) {
+                    setResumeError(err instanceof Error ? err.message : 'Gagal mengunggah resume.');
+                  } finally {
+                    setResumeUploading(false);
+                  }
+                }}
+                disabled={resumeUploading}
+                className="px-6 py-3 bg-green-600 hover:bg-green-500 disabled:bg-green-600/40 text-white font-semibold rounded-lg transition-colors text-sm"
+              >
+                {resumeUploading ? 'Mengunggah...' : 'Unggah Resume PDF'}
+              </button>
+              <p className="text-xs text-zinc-500">File akan diunggah ke bucket Supabase <strong>resume</strong> dengan nama `resume.pdf`.</p>
+            </div>
+          </div>
+        </div>
 
         {/* Add Project Form Drawer/Container */}
         {showForm && (

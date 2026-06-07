@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useRef, Suspense } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DownloadIcon } from '@/components/ui';
 import { useLanguage } from '@/context/LanguageContext';
+import { createClient } from '@/lib/supabase/client';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -38,6 +39,7 @@ export default function Hero() {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
+  const [resumeUrl, setResumeUrl] = useState('/resume/noval-abdillah.pdf');
 
   useEffect(() => {
     // Use gsap.context for proper cleanup on unmount/re-renders in React 18+
@@ -65,6 +67,32 @@ export default function Hero() {
     }, containerRef);
 
     return () => ctx.revert(); // Cleanup animation state on unmount
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadResumeUrl = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = supabase.storage.from('resume').getPublicUrl('resume.pdf');
+
+        if (data?.publicUrl) {
+          const response = await fetch(data.publicUrl, { method: 'HEAD' });
+          if (active && response.ok) {
+            setResumeUrl(data.publicUrl);
+          }
+        }
+      } catch {
+        // fallback to bundled resume file
+      }
+    };
+
+    loadResumeUrl();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -102,7 +130,7 @@ export default function Hero() {
             {t.hero.viewProjects}
           </Link>
           <a
-            href="/resume/noval-abdillah.pdf"
+            href={resumeUrl}
             download
             className="px-8 py-4 border border-zinc-700 hover:border-green-500 text-zinc-300 hover:text-green-500 font-semibold rounded-lg transition-all duration-300 flex items-center gap-2"
           >
