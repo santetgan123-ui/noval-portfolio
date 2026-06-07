@@ -38,50 +38,37 @@ export default function Hero() {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
-  const [resumeUrl, setResumeUrl] = useState('/resume/CV_Frontend_Backend (1).pdf');
   const [showResume, setShowResume] = useState(false);
+  
+  // Hardcoded local path to the resume file in public/resume/
+  const resumeUrl = '/resume/CV_Frontend_Backend (1).pdf';
 
   useEffect(() => {
+    // Use gsap.context for proper cleanup on unmount/re-renders in React 18+
     const ctx = gsap.context(() => {
+      // Headline fade-up
       gsap.fromTo(
         headlineRef.current,
         { y: 50, opacity: 0 },
         { y: 0, opacity: 1, duration: 1, ease: 'power4.out', delay: 0.3 }
       );
+
+      // Subtitle fade-up
       gsap.fromTo(
         subtitleRef.current,
         { y: 40, opacity: 0 },
         { y: 0, opacity: 1, duration: 1, delay: 0.6, ease: 'power3.out' }
       );
+
+      // CTA fade-up
       gsap.fromTo(
         ctaRef.current,
         { y: 30, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.8, delay: 0.9, ease: 'power3.out' }
       );
     }, containerRef);
-    return () => ctx.revert();
-  }, []);
 
-  useEffect(() => {
-    let active = true;
-    const loadResumeUrl = async () => {
-      try {
-        const supabase = createClient();
-        const { data: settingsData } = await supabase
-          .from('site_settings')
-          .select('value')
-          .eq('key', 'resume_url')
-          .single();
-
-        if (settingsData?.value && active) {
-          setResumeUrl(settingsData.value);
-        }
-      } catch (error) {
-        console.error('Error loading resume:', error);
-      }
-    };
-    loadResumeUrl();
-    return () => { active = false; };
+    return () => ctx.revert(); // Cleanup animation state on unmount
   }, []);
 
   return (
@@ -153,7 +140,7 @@ export default function Hero() {
               />
             </div>
 
-            {/* Modal Footer (Optional: Quick actions) */}
+            {/* Modal Footer */}
             <div className="px-6 py-4 border-t border-zinc-800 bg-zinc-900/50 flex items-center justify-end gap-4">
               <p className="text-xs text-zinc-500 mr-auto font-mono uppercase tracking-widest hidden sm:block">
                 Noval Abdillah Portfolio
