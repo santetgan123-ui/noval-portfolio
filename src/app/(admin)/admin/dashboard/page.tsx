@@ -341,6 +341,28 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        <div className="mb-10 rounded-3xl border border-emerald-600/20 bg-emerald-950/10 p-6 text-zinc-100">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-white">Upload Resume PDF</h2>
+              <p className="text-sm text-zinc-400 mt-1">
+                Untuk mengunggah file resume baru, klik tombol <span className="font-semibold text-emerald-300">Kelola Resume</span> di samping.
+                Ketika berhasil, kamu akan menemukan tombol <span className="font-semibold text-emerald-300">Unggah Resume PDF</span> di panel berikutnya.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const target = document.getElementById('resume-section');
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg transition-colors text-sm"
+            >
+              Buka Panel Resume
+            </button>
+          </div>
+        </div>
+
         {/* Global Dashboard Feedback Notification */}
         {dashboardError && (
           <div className="mb-8 p-4 bg-red-950/40 border border-red-800/60 rounded-xl flex items-start gap-3 text-red-400">
