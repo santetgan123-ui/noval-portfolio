@@ -38,42 +38,50 @@ export default function Hero() {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
-  const [resumeUrl] = useState('/resume/CV_Frontend_Backend (1).pdf');
+  const [resumeUrl, setResumeUrl] = useState('/resume/CV_Frontend_Backend (1).pdf');
   const [showResume, setShowResume] = useState(false);
 
-  // Encode URL untuk menangani spasi dan karakter khusus
-  const encodedResumeUrl = typeof window !== 'undefined' 
-    ? `${window.location.origin}${resumeUrl.replace(/\s/g, '%20')}`
-    : resumeUrl;
-
-  const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(encodedResumeUrl)}&embedded=true`;
-
   useEffect(() => {
-    // Use gsap.context for proper cleanup on unmount/re-renders in React 18+
     const ctx = gsap.context(() => {
-      // Headline fade-up
       gsap.fromTo(
         headlineRef.current,
         { y: 50, opacity: 0 },
         { y: 0, opacity: 1, duration: 1, ease: 'power4.out', delay: 0.3 }
       );
-
-      // Subtitle fade-up
       gsap.fromTo(
         subtitleRef.current,
         { y: 40, opacity: 0 },
         { y: 0, opacity: 1, duration: 1, delay: 0.6, ease: 'power3.out' }
       );
-
-      // CTA fade-up
       gsap.fromTo(
         ctaRef.current,
         { y: 30, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.8, delay: 0.9, ease: 'power3.out' }
       );
     }, containerRef);
+    return () => ctx.revert();
+  }, []);
 
-    return () => ctx.revert(); // Cleanup animation state on unmount
+  useEffect(() => {
+    let active = true;
+    const loadResumeUrl = async () => {
+      try {
+        const supabase = createClient();
+        const { data: settingsData } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'resume_url')
+          .single();
+
+        if (settingsData?.value && active) {
+          setResumeUrl(settingsData.value);
+        }
+      } catch (error) {
+        console.error('Error loading resume:', error);
+      }
+    };
+    loadResumeUrl();
+    return () => { active = false; };
   }, []);
 
   return (
@@ -139,7 +147,7 @@ export default function Hero() {
             {/* PDF Viewer */}
             <div className="flex-1 bg-zinc-950 overflow-hidden relative">
               <iframe
-                src={googleViewerUrl}
+                src={`${resumeUrl}#toolbar=0&navpanes=0&scrollbar=1`}
                 className="w-full h-full border-none"
                 title="Resume Preview"
               />
